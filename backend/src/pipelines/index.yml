@@ -1,0 +1,149 @@
+components:
+  document_cleaner:
+    init_parameters:
+      ascii_only: false
+      keep_id: false
+      remove_empty_lines: true
+      remove_extra_whitespaces: true
+      remove_regex: null
+      remove_repeated_substrings: false
+      remove_substrings: null
+      unicode_normalization: null
+    type: haystack.components.preprocessors.document_cleaner.DocumentCleaner
+  document_embedder:
+    init_parameters:
+      batch_size: 32
+      config_kwargs: null
+      device:
+        device: cpu
+        type: single
+      embedding_separator: '
+
+        '
+      meta_fields_to_embed: []
+      model: intfloat/multilingual-e5-base
+      model_kwargs: null
+      normalize_embeddings: false
+      precision: float32
+      prefix: ''
+      progress_bar: true
+      suffix: ''
+      token:
+        env_vars:
+        - HF_API_TOKEN
+        - HF_TOKEN
+        strict: false
+        type: env_var
+      tokenizer_kwargs: null
+      truncate_dim: null
+      trust_remote_code: false
+    type: haystack.components.embedders.sentence_transformers_document_embedder.SentenceTransformersDocumentEmbedder
+  document_joiner:
+    init_parameters:
+      join_mode: concatenate
+      sort_by_score: true
+      top_k: null
+      weights: null
+    type: haystack.components.joiners.document_joiner.DocumentJoiner
+  document_splitter:
+    init_parameters:
+      split_by: word
+      split_length: 250
+      split_overlap: 30
+      split_threshold: 0
+    type: haystack.components.preprocessors.document_splitter.DocumentSplitter
+  document_writer:
+    init_parameters:
+      document_store:
+        init_parameters:
+          create_index: true
+          embedding_dim: 768
+          hosts: https://localhost:9200
+          http_auth: !!python/tuple
+          - admin
+          - your-password
+          index: default
+          mappings:
+            dynamic_templates:
+            - strings:
+                mapping:
+                  type: keyword
+                match_mapping_type: string
+            properties:
+              content:
+                type: text
+              embedding:
+                dimension: 768
+                index: true
+                type: knn_vector
+          max_chunk_bytes: 104857600
+          method: null
+          return_embedding: false
+          settings:
+            index.knn: true
+          ssl_assert_hostname: false
+          ssl_show_warn: false
+          timeout: null
+          use_ssl: true
+          verify_certs: false
+        type: haystack_integrations.document_stores.opensearch.document_store.OpenSearchDocumentStore
+      policy: SKIP
+    type: haystack.components.writers.document_writer.DocumentWriter
+  file_type_router:
+    init_parameters:
+      additional_mimetypes: null
+      mime_types:
+      - text/plain
+      - application/pdf
+      - text/markdown
+    type: haystack.components.routers.file_type_router.FileTypeRouter
+  markdown_converter:
+    init_parameters:
+      progress_bar: true
+      store_full_path: true
+      table_to_single_line: false
+    type: haystack.components.converters.markdown.MarkdownToDocument
+  pdf_file_converter:
+    init_parameters:
+      converter: null
+      extraction_mode: plain
+      layout_mode_font_height_weight: 1.0
+      layout_mode_scale_weight: 1.25
+      layout_mode_space_vertically: true
+      layout_mode_strip_rotated: true
+      plain_mode_orientations: !!python/tuple
+      - 0
+      - 90
+      - 180
+      - 270
+      plain_mode_space_width: 200.0
+      store_full_path: true
+    type: haystack.components.converters.pypdf.PyPDFToDocument
+  text_file_converter:
+    init_parameters:
+      encoding: utf-8
+      store_full_path: true
+    type: haystack.components.converters.txt.TextFileToDocument
+connections:
+- receiver: text_file_converter.sources
+  sender: file_type_router.text/plain
+- receiver: pdf_file_converter.sources
+  sender: file_type_router.application/pdf
+- receiver: markdown_converter.sources
+  sender: file_type_router.text/markdown
+- receiver: document_joiner.documents
+  sender: text_file_converter.documents
+- receiver: document_joiner.documents
+  sender: pdf_file_converter.documents
+- receiver: document_joiner.documents
+  sender: markdown_converter.documents
+- receiver: document_cleaner.documents
+  sender: document_joiner.documents
+- receiver: document_splitter.documents
+  sender: document_cleaner.documents
+- receiver: document_embedder.documents
+  sender: document_splitter.documents
+- receiver: document_writer.documents
+  sender: document_embedder.documents
+max_runs_per_component: 100
+metadata: {}

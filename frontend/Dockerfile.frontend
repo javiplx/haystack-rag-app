@@ -1,0 +1,25 @@
+# Build stage
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+ARG REACT_APP_HAYSTACK_API_URL
+ENV REACT_APP_HAYSTACK_API_URL=$REACT_APP_HAYSTACK_API_URL
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+# Add nginx
+FROM nginx:alpine
+
+# Copy built files from the build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Note: Nginx configuration have to be mounted from ../conf as a volume at runtime
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]

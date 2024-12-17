@@ -1,0 +1,146 @@
+components:
+  answer_builder:
+    init_parameters:
+      pattern: null
+      reference_pattern: null
+    type: haystack.components.builders.answer_builder.AnswerBuilder
+  bm25_retriever:
+    init_parameters:
+      custom_query: null
+      document_store:
+        init_parameters:
+          create_index: true
+          embedding_dim: 768
+          hosts: https://localhost:9200
+          http_auth: &id001 !!python/tuple
+          - admin
+          - your-password
+          index: default
+          mappings: &id002
+            dynamic_templates:
+            - strings:
+                mapping:
+                  type: keyword
+                match_mapping_type: string
+            properties:
+              content:
+                type: text
+              embedding:
+                dimension: 768
+                index: true
+                type: knn_vector
+          max_chunk_bytes: 104857600
+          method: null
+          return_embedding: false
+          settings: &id003
+            index.knn: true
+          ssl_assert_hostname: false
+          ssl_show_warn: false
+          timeout: null
+          use_ssl: true
+          verify_certs: false
+        type: haystack_integrations.document_stores.opensearch.document_store.OpenSearchDocumentStore
+      filter_policy: replace
+      filters: {}
+      fuzziness: AUTO
+      raise_on_failure: true
+      scale_score: false
+      top_k: 10
+    type: haystack_integrations.components.retrievers.opensearch.bm25_retriever.OpenSearchBM25Retriever
+  document_joiner:
+    init_parameters:
+      join_mode: concatenate
+      sort_by_score: true
+      top_k: null
+      weights: null
+    type: haystack.components.joiners.document_joiner.DocumentJoiner
+  embedding_retriever:
+    init_parameters:
+      custom_query: null
+      document_store:
+        init_parameters:
+          create_index: true
+          embedding_dim: 768
+          hosts: https://localhost:9200
+          http_auth: *id001
+          index: default
+          mappings: *id002
+          max_chunk_bytes: 104857600
+          method: null
+          return_embedding: false
+          settings: *id003
+          ssl_assert_hostname: false
+          ssl_show_warn: false
+          timeout: null
+          use_ssl: true
+          verify_certs: false
+        type: haystack_integrations.document_stores.opensearch.document_store.OpenSearchDocumentStore
+      efficient_filtering: false
+      filter_policy: replace
+      filters: {}
+      raise_on_failure: true
+      top_k: 10
+    type: haystack_integrations.components.retrievers.opensearch.embedding_retriever.OpenSearchEmbeddingRetriever
+  llm:
+    init_parameters:
+      api_base_url: null
+      api_key:
+        env_vars:
+        - OPENAI_API_KEY
+        strict: true
+        type: env_var
+      generation_kwargs: {}
+      model: gpt-4o
+      organization: null
+      streaming_callback: null
+      system_prompt: null
+    type: haystack.components.generators.openai.OpenAIGenerator
+  prompt_builder:
+    init_parameters:
+      required_variables: null
+      template: "\n    Given the following context, answer the question.\n    Context:\n\
+        \    {% for document in documents %}\n        {{ document.content }}\n   \
+        \ {% endfor %}\n    Question: {{query}}\n    Answer:\n    "
+      variables: null
+    type: haystack.components.builders.prompt_builder.PromptBuilder
+  query_embedder:
+    init_parameters:
+      batch_size: 32
+      config_kwargs: null
+      device:
+        device: cpu
+        type: single
+      model: intfloat/multilingual-e5-base
+      model_kwargs: null
+      normalize_embeddings: false
+      precision: float32
+      prefix: ''
+      progress_bar: true
+      suffix: ''
+      token:
+        env_vars:
+        - HF_API_TOKEN
+        - HF_TOKEN
+        strict: false
+        type: env_var
+      tokenizer_kwargs: null
+      truncate_dim: null
+      trust_remote_code: false
+    type: haystack.components.embedders.sentence_transformers_text_embedder.SentenceTransformersTextEmbedder
+connections:
+- receiver: embedding_retriever.query_embedding
+  sender: query_embedder.embedding
+- receiver: document_joiner.documents
+  sender: bm25_retriever.documents
+- receiver: document_joiner.documents
+  sender: embedding_retriever.documents
+- receiver: answer_builder.documents
+  sender: embedding_retriever.documents
+- receiver: prompt_builder.documents
+  sender: document_joiner.documents
+- receiver: llm.prompt
+  sender: prompt_builder.prompt
+- receiver: answer_builder.replies
+  sender: llm.replies
+max_runs_per_component: 100
+metadata: {}
