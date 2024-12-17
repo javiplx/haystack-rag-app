@@ -1,6 +1,7 @@
 import logging
 import sys
 
+from dotenv import load_dotenv
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from pydantic import (
@@ -53,10 +54,11 @@ class Settings(BaseSettings):
         env_file_encoding = 'utf-8'
         case_sensitive = False  # This allows case-insensitive matching of env vars
 
-#print(f"Looking for .env file at: {Settings.Config.env_file.resolve()}")
-
 def load_settings():
     try:
+        # Load .env file if it exists
+        #print(f"Looking for .env file at: {Settings.Config.env_file.resolve()}")
+        load_dotenv(Settings.Config.env_file)
         return Settings()
     except ValidationError as e:
         print("Error: Failed to load configuration settings.", file=sys.stderr)
