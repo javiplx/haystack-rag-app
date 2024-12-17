@@ -64,7 +64,7 @@ query_service-1     | INFO:     127.0.0.1:58698 - "GET /health HTTP/1.1" 200 OK
 
 ### An example query and response
 
-<img width="1388" alt="hra-example-screenshot" src="https://github.com/user-attachments/assets/94de1660-a7a5-47aa-afb6-2a732cee5f9a" />
+<img width="1388" alt="hra-example-screenshot" src="https://github.com/user-attachments/assets/a1fb86d5-ecc1-4041-9884-2e395544506a" />
 
 ## How the Application Works with Docker
 
