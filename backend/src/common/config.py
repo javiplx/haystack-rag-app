@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     generator: str = Field(default="openai", description="Generator to use (currently openai only)")
     openai_api_key: str | None = Field(default=None, description="OpenAI API key")
     use_openai_embedder: bool = Field(default=True, description="Use OpenAI embedder")
+    tokenizers_parallelism: bool = Field(default=False, description="Use tokenizers parallelism")
     log_level: str = Field(default="INFO", description="Logging level")
     haystack_log_level: str = Field(default="INFO", description="Haystack logging level")
     index_on_startup: bool = Field(default=True, description="Always index files on startup")
