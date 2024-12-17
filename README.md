@@ -197,3 +197,16 @@ While inside the ./haystack-rag-app directory:
 ```
 curl -X POST http://localhost:8080/api/search -H "Content-Type: application/json" -d '{"query": "What is the capital of France?"}'
 ```
+
+### Removing all Docker containers, images, and volumes
+
+If you need to completely reset your Docker containers and images environment, you can do the following:
+
+```
+docker rm -f $(docker ps -aq) && \
+docker rmi -f $(docker images -aq) && \
+docker system prune -a --volumes && \
+docker volume rm $(docker volume ls -q)
+```
+
+Careful! This will remove all containers, images, volumes, and prune all unused images.
