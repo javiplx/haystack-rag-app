@@ -20,7 +20,13 @@ describe('API Calls', () => {
   });
 
   test('searchQuery', async () => {
-    const mockResponse = { results: ['Mocked response'] };
+    const mockResponse = {
+      results: [{
+        answers: [{
+          answer: 'Mocked response'
+        }]
+      }]
+    };
     fetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
