@@ -209,4 +209,4 @@ docker system prune -a --volumes && \
 docker volume rm $(docker volume ls -q)
 ```
 
-Careful! This will remove all containers, images, volumes, and prune all unused images.
+Careful! This will remove all containers, images, and volumes.
