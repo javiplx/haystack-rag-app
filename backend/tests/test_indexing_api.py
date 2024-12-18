@@ -11,20 +11,21 @@ from fastapi.testclient import TestClient
 from unittest.mock import Mock, patch
 
 from indexing.main import app, get_indexing_service
+from indexing.service import IndexingService
 from common.models import SearchQuery, SearchResponse
 
 
 client = TestClient(app)
 
 @pytest.fixture
-def mock_query_service():
-    with patch("query.main.query_service") as mock:
+def mock_indexing_service():
+    with patch("indexing.main.indexing_service") as mock:
         yield mock
 
 # Test /files upload
-def test_upload_files(mock_query_service):
-    app.dependency_overrides[get_indexing_service] = lambda: mock_query_service
-    mock_query_service.save_uploaded_file.return_value = "/path/to/files/test_file.txt"
+def test_upload_files(mock_indexing_service):
+    app.dependency_overrides[get_indexing_service] = lambda: mock_indexing_service
+    mock_indexing_service.save_uploaded_file.return_value = "/path/to/files/test_file.txt"
 
     with open("test_file.txt", "w") as f:
         f.write("Test content")
@@ -34,20 +35,20 @@ def test_upload_files(mock_query_service):
 
     assert response.status_code == 200
     assert response.json() == [{"file_id": "test_file.txt", "status": "success", "error": None}]
-    mock_query_service.save_uploaded_file.assert_called_once_with("test_file.txt", b"Test content")
+    mock_indexing_service.save_uploaded_file.assert_called_once_with("test_file.txt", b"Test content")
     app.dependency_overrides.clear()
     # Clean up the test file
     os.remove("test_file.txt")
 
 # Test /files get
-def test_get_files(mock_query_service):
-    app.dependency_overrides[get_indexing_service] = lambda: mock_query_service
-    mock_query_service.rescan_files_and_paths.return_value = ["file1.txt", "file2.txt"]
+def test_get_files(mock_indexing_service):
+    app.dependency_overrides[get_indexing_service] = lambda: mock_indexing_service
+    mock_indexing_service.rescan_files_and_paths.return_value = ["file1.txt", "file2.txt"]
 
     response = client.get("/files")
     assert response.status_code == 200
     assert response.json() == {"files": ["file1.txt", "file2.txt"]}
-    mock_query_service.rescan_files_and_paths.assert_called_once()
+    mock_indexing_service.rescan_files_and_paths.assert_called_once()
     app.dependency_overrides.clear()
 
 # Test /
