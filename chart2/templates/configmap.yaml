@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haystack-rag-config
+data:
+  # Use 'https://localhost:9200' if not Docker Compose
+  OPENSEARCH_HOST: http://opensearch:9200
+  OPENSEARCH_USER: admin
+  # CHANGE OpenSearch admin password!!! ("a minimum 8 character password and must
+  # contain at least one uppercase letter, one lowercase letter, one digit,
+  # and one special character"). Avoid using % in the password.
+  OPENSEARCH_PASSWORD: Y0ur.password_here
+
+  # Generator to use (currently 'openai' only)
+  GENERATOR: openai
+
+  # OpenAI API key
+  OPENAI_API_KEY: sk-proj-999
+
+  # Use OpenAI embedder (set to 'false' to use SentenceTransformers instead)
+  USE_OPENAI_EMBEDDER: "false"
+
+  # Disable warning from huggingface/tokenizers when using SentenceTransformers
+  TOKENIZERS_PARALLELISM: "false"
+
+  # Logging level (DEBUG, INFO, WARNING, ERROR)
+  LOG_LEVEL: INFO
+
+  # Haystack logging level (DEBUG, INFO, WARNING, ERROR)
+  HAYSTACK_LOG_LEVEL: INFO
+
+  # Always index files on startup (set to 'false' to disable)
+  INDEX_ON_STARTUP: "true"
+
+  # Load pipelines from YAML files (set to 'false' to use code-defined pipelines)
+  PIPELINES_FROM_YAML: "false"
