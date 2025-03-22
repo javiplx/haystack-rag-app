@@ -1,0 +1,4 @@
+name: haystack-rag
+description: Haystack RAG Application
+version: 0.1.0
+apiVersion: v2

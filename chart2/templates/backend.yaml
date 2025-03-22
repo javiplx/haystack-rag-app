@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: haystack-rag
+    component: backend
+spec:
+  selector:
+    matchLabels:
+      app: haystack-rag
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: haystack-rag
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: haystack-rag-query:1.0.0
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          ports:
+            - name: api
+              containerPort: 8002
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch
+  labels:
+    app: haystack-rag
+    component: opensearch
+spec:
+  selector:
+    matchLabels:
+      app: haystack-rag
+      component: opensearch
+  template:
+    metadata:
+      labels:
+        app: haystack-rag
+        component: opensearch
+    spec:
+      containers:
+        - name: opensearch
+          image: opensearchproject/opensearch:2.18.0
+          env:
+            - name: discovery.type
+              value: single-node
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: OPENSEARCH_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+            - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+              value: ${OPENSEARCH_PASSWORD}
+          ports:
+            - name: api
+              containerPort: 9200
+            - name: perf
+              containerPort: 9600
+          readinessProbe:
+            httpGet:
+              path: /_cluster/health
+              port: api
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /_cluster/health
+              port: api
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5

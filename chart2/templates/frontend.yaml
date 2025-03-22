@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: haystack-rag
+    component: frontend
+spec:
+  selector:
+    matchLabels:
+      app: haystack-rag
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: haystack-rag
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: haystack-rag-frontend:1.0.0
+          env:
+            - name: REACT_APP_HAYSTACK_API_URL
+              value: /api
+          ports:
+            - name: web
+              containerPort: 3000
