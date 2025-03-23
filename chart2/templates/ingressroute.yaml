@@ -9,6 +9,13 @@ spec:
     - web
   routes:
     - kind: Rule
+      match: Host(`rag.localdomain`) && PathPrefix(`/api/search`)
+      middlewares:
+        - name: api-strip
+      services:
+        - name: backend
+          port: api
+    - kind: Rule
       match: Host(`rag.localdomain`) && PathPrefix(`/api`)
       middlewares:
         - name: api-strip
