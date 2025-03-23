@@ -4,3 +4,6 @@ secretName: opensearch-password
 opensearch:
   # Enable the bundled opensearch. Default is to manage opensearch externally
   enable: false
+
+persistence:
+  enabled: false

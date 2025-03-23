@@ -53,11 +53,19 @@ spec:
             failureThreshold: 18
       volumes:
         - name: backend-files
+          {{ if .Values.persistence.enabled -}}
           persistentVolumeClaim:
             claimName: backend-files
+          {{- else -}}
+          emptyDir: {}
+          {{- end }}
         - name: backend-pipelines
+          {{ if .Values.persistence.enabled -}}
           persistentVolumeClaim:
             claimName: backend-pipelines
+          {{- else -}}
+          emptyDir: {}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
