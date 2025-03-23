@@ -25,6 +25,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: haystack-rag-config
+            - secretRef:
+                name: {{ .Values.secretName }}
           ports:
             - name: api
               containerPort: 8002

@@ -1,0 +1,2 @@
+# Pre-existing secret with opensearch password (OPENSEARCH_PASSWORD)
+secretName: opensearch-password

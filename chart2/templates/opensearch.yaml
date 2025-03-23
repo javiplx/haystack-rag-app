@@ -27,7 +27,10 @@ spec:
             - name: OPENSEARCH_JAVA_OPTS
               value: -Xms512m -Xmx512m
             - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
-              value: Y0ur.password_here
+              value: $(OPENSEARCH_PASSWORD)
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretName }}
           ports:
             - name: api
               containerPort: 9200
