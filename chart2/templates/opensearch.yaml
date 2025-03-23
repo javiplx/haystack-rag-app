@@ -67,3 +67,20 @@ spec:
         resources:
           requests:
             storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch
+  labels:
+    app: haystack-rag
+    component: opensearch
+spec:
+  type: ClusterIP
+  ports:
+    - name: api
+      port: 9200
+      targetPort: api
+  selector:
+    app: haystack-rag
+    component: opensearch

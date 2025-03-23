@@ -25,3 +25,20 @@ spec:
           ports:
             - name: web
               containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: haystack-rag
+    component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 80
+      targetPort: web
+  selector:
+    app: haystack-rag
+    component: frontend
