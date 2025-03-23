@@ -13,7 +13,7 @@ spec:
       middlewares:
         - name: api-strip
       services:
-        - name: backend
+        - name: indexing
           port: api
     - kind: Rule
       match: Host(`rag.localdomain`)
