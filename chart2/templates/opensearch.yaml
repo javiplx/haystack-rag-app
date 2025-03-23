@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: opensearch
   labels:
@@ -31,6 +31,9 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ .Values.secretName }}
+          volumeMounts:
+            - mountPath: /usr/share/opensearch/data
+              name: opensearch-data
           ports:
             - name: api
               containerPort: 9200
@@ -50,3 +53,17 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 5
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        labels:
+          app: haystack-rag
+          component: opensearch
+        name: opensearch-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
