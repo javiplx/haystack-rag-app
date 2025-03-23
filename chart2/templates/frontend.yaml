@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: {{ template "prefix" . }}frontend
   labels:
     app: haystack-rag
     component: frontend
@@ -29,12 +29,12 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: frontend-config
+            name: {{ template "prefix" . }}frontend-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: {{ template "prefix" . }}frontend
   labels:
     app: haystack-rag
     component: frontend

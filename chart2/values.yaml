@@ -1,9 +1,30 @@
-# Pre-existing secret with opensearch password (OPENSEARCH_PASSWORD)
+# Add a fixed prefix to all resource names
+prefix:
+  enabled: false
+
+# Pre-existing secret with opensearch password and openapi key
 secretName: opensearch-password
 
+# Enable the bundled opensearch. Default is to manage opensearch externally
 opensearch:
-  # Enable the bundled opensearch. Default is to manage opensearch externally
   enable: false
+  host: http://opensearch-cluster-master:9200
 
+# Create persistent volumes
 persistence:
   enabled: false
+
+query:
+  resources:
+    requests:
+      memory: 256Ki
+      cpu: 100m
+    limits:
+      memory: 512Ki
+      cpu: 200m
+
+indexing:
+  resources:
+    requests:
+      memory: 256Ki
+      cpu: 100m

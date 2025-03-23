@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontend-config
+  name: {{ template "prefix" . }}frontend-config
 data:
   default.conf: |
     server {

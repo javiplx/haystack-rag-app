@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: {{ template "prefix" . }}backend
   labels:
     app: haystack-rag
     component: backend
@@ -22,9 +22,11 @@ spec:
           env:
             - name: PYTHONUNBUFFERED
               value: "1"
+            - name: OPENSEARCH_HOST
+              value: {{ .Values.opensearch.host }}
           envFrom:
             - configMapRef:
-                name: haystack-rag-config
+                name: {{ template "prefix" . }}rag-config
             - secretRef:
                 name: {{ .Values.secretName }}
           volumeMounts:
@@ -35,6 +37,13 @@ spec:
           ports:
             - name: api
               containerPort: 8002
+          resources:
+            {{- if ((.Values.query).resources).requests }}
+            requests: {{ toYaml .Values.query.resources.requests | nindent 14 }}
+            {{- end }}
+            {{- if ((.Values.query).resources).limits }}
+            limits: {{ toYaml .Values.query.resources.limits | nindent 14 }}
+            {{- end }}
           readinessProbe:
             httpGet:
               path: /health
@@ -70,7 +79,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: {{ template "prefix" . }}backend
   labels:
     app: haystack-rag
     component: backend

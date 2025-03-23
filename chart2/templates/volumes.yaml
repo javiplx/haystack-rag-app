@@ -5,7 +5,7 @@ metadata:
   labels:
     app: haystack-rag
     component: backend
-  name: backend-files
+  name: {{ template "prefix" . }}backend-files
 spec:
   accessModes:
     - ReadWriteMany
@@ -19,7 +19,7 @@ metadata:
   labels:
     app: haystack-rag
     component: backend
-  name: backend-pipelines
+  name: {{ template "prefix" . }}backend-pipelines
 spec:
   accessModes:
     - ReadWriteMany
