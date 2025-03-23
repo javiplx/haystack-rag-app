@@ -18,10 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: haystack-rag-frontend:1.0.0
-          env:
-            - name: REACT_APP_HAYSTACK_API_URL
-              value: /api
+          image: haystack-rag-frontend:2.0.0
           ports:
             - name: web
               containerPort: 3000
