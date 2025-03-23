@@ -3,8 +3,7 @@ kind: ConfigMap
 metadata:
   name: haystack-rag-config
 data:
-  # Use 'https://localhost:9200' if not Docker Compose
-  OPENSEARCH_HOST: http://opensearch:9200
+  OPENSEARCH_HOST: http://opensearch-cluster-master:9200
   OPENSEARCH_USER: admin
 
   # Generator to use (currently 'openai' only)
