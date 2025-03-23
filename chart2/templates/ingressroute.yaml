@@ -1,0 +1,20 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend
+  labels:
+    app: haystack-rag
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`rag.localdomain`) && PathPrefix(`/api`)
+      services:
+        - name: backend
+          port: api
+    - kind: Rule
+      match: Host(`rag.localdomain`)
+      services:
+        - name: frontend
+          port: web
