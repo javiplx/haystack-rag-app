@@ -9,9 +9,6 @@ data:
   # Generator to use (currently 'openai' only)
   GENERATOR: openai
 
-  # OpenAI API key
-  OPENAI_API_KEY: sk-proj-999
-
   # Use OpenAI embedder (set to 'false' to use SentenceTransformers instead)
   USE_OPENAI_EMBEDDER: "false"
 
