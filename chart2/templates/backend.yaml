@@ -27,6 +27,11 @@ spec:
                 name: haystack-rag-config
             - secretRef:
                 name: {{ .Values.secretName }}
+          volumeMounts:
+            - mountPath: /app/files
+              name: backend-files
+            - mountPath: /app/pipelines
+              name: backend-pipelines
           ports:
             - name: api
               containerPort: 8002
@@ -46,6 +51,13 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 18
+      volumes:
+        - name: backend-files
+          persistentVolumeClaim:
+            claimName: backend-files
+        - name: backend-pipelines
+          persistentVolumeClaim:
+            claimName: backend-pipelines
 ---
 apiVersion: v1
 kind: Service
