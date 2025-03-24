@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "prefix" . }}frontend
+  labels:
+    app: haystack-rag
+    component: frontend
+spec:
+  selector:
+    matchLabels:
+      app: haystack-rag
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: haystack-rag
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: haystack-rag-frontend:2.0.0
+          ports:
+            - name: web
+              containerPort: 3000
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "prefix" . }}frontend-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "prefix" . }}frontend
+  labels:
+    app: haystack-rag
+    component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 80
+      targetPort: web
+  selector:
+    app: haystack-rag
+    component: frontend

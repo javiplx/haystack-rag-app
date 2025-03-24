@@ -1,0 +1,40 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ template "prefix" . }}backend
+  labels:
+    app: haystack-rag
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`rag.localdomain`) && PathPrefix(`/api/search`)
+      middlewares:
+        - name: {{ template "prefix" . }}api-strip
+      services:
+        - name: {{ template "prefix" . }}backend
+          port: api
+    - kind: Rule
+      match: Host(`rag.localdomain`) && PathPrefix(`/api`)
+      middlewares:
+        - name: {{ template "prefix" . }}api-strip
+      services:
+        - name: {{ template "prefix" . }}indexing
+          port: api
+    - kind: Rule
+      match: Host(`rag.localdomain`)
+      services:
+        - name: {{ template "prefix" . }}frontend
+          port: web
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ template "prefix" . }}api-strip
+  labels:
+    app: haystack-rag
+spec:
+  stripPrefix:
+    prefixes:
+      - /api

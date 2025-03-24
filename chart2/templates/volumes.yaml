@@ -1,0 +1,29 @@
+{{ if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: haystack-rag
+    component: backend
+  name: {{ template "prefix" . }}backend-files
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: haystack-rag
+    component: backend
+  name: {{ template "prefix" . }}backend-pipelines
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+{{ end }}

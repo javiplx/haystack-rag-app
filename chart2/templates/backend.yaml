@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "prefix" . }}backend
+  labels:
+    app: haystack-rag
+    component: backend
+spec:
+  selector:
+    matchLabels:
+      app: haystack-rag
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: haystack-rag
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: haystack-rag-query:1.0.0
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: OPENSEARCH_HOST
+              value: {{ .Values.opensearch.host }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "prefix" . }}rag-config
+            - secretRef:
+                name: {{ .Values.secretName }}
+          volumeMounts:
+            - mountPath: /app/files
+              name: backend-files
+            - mountPath: /app/pipelines
+              name: backend-pipelines
+          ports:
+            - name: api
+              containerPort: 8002
+          resources:
+            {{- if ((.Values.query).resources).requests }}
+            requests: {{ toYaml .Values.query.resources.requests | nindent 14 }}
+            {{- end }}
+            {{- if ((.Values.query).resources).limits }}
+            limits: {{ toYaml .Values.query.resources.limits | nindent 14 }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18
+      volumes:
+        - name: backend-files
+          {{ if .Values.persistence.enabled -}}
+          persistentVolumeClaim:
+            claimName: backend-files
+          {{- else -}}
+          emptyDir: {}
+          {{- end }}
+        - name: backend-pipelines
+          {{ if .Values.persistence.enabled -}}
+          persistentVolumeClaim:
+            claimName: backend-pipelines
+          {{- else -}}
+          emptyDir: {}
+          {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "prefix" . }}backend
+  labels:
+    app: haystack-rag
+    component: backend
+spec:
+  type: ClusterIP
+  ports:
+    - name: api
+      port: 8002
+      targetPort: api
+  selector:
+    app: haystack-rag
+    component: backend
